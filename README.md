@@ -5,6 +5,7 @@ Fix the problem of accessing internet on WSL when using VPN
 by commented the disable with #
 >sudo nano /etc/wsl.conf
 
->bash
->#[network]
->#generateResolvConf = false
+```bash
+#[network]
+#generateResolvConf = false
+```
