@@ -37,19 +37,6 @@ while [[ ${#} -gt 0 ]]; do
   esac
 done
 
-# If there is data on stdin (piped extra nameservers), read and add them.
-# Accept lines like: 1.2.3.4 or "nameserver 1.2.3.4" or CRLF-terminated.
-if [ ! -t 0 ]; then
-  while IFS= read -r line; do
-    # strip windows CR
-    line=${line%$'\r'}
-    # extract IPv4 or IPv6 between words
-    if [[ $line =~ ([0-9A-Fa-f:.]+) ]]; then
-      add_ns "${BASH_REMATCH[1]}"
-    fi
-  done < /dev/stdin
-fi
-
 # Helper: print to stderr
 eprintf(){ printf "%s\n" "$*" >&2; }
 
@@ -62,6 +49,19 @@ add_ns(){
   done
   ns_list+=("$ip")
 }
+
+# If there is data on stdin (piped extra nameservers), read and add them.
+# Accept lines like: 1.2.3.4 or "nameserver 1.2.3.4" or CRLF-terminated.
+if [ ! -t 0 ]; then
+  while IFS= read -r line; do
+    # strip windows CR
+    line=${line%$'\r'}
+    # extract IPv4 or IPv6 between words
+    if [[ $line =~ ([0-9A-Fa-f:.]+) ]]; then
+      add_ns "${BASH_REMATCH[1]}"
+    fi
+  done < /dev/stdin
+fi
 
 # 1) systemd-resolved via resolvectl
 if command -v resolvectl >/dev/null 2>&1; then
